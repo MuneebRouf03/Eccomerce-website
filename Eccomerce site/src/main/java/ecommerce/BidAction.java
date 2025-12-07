@@ -1,108 +1,115 @@
 package ecommerce;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemAction extends BaseAction {
+public class BidAction extends BaseAction
+{
     private String itemName;
-    private String description;
-    private double price;
-    private List<Item> items;
+    private String bidAmount;
     
-    // Inner class to represent an item
-    public class Item {
-        private int itemId;
-        private String itemName;
-        private String description;
-        private double price;
-        private String sellerName;
+    // For viewing bids
+    private List<Bid> bids;
+    
+    // Simple bid class
+    public class Bid {
+        public String itemName;
+        public String bidder;
+        public String amount;
         
-        // Getters and setters
-        public int getItemId() { return itemId; }
-        public void setItemId(int itemId) { this.itemId = itemId; }
-        public String getItemName() { return itemName; }
-        public void setItemName(String itemName) { this.itemName = itemName; }
-        public String getDescription() { return description; }
-        public void setDescription(String description) { this.description = description; }
-        public double getPrice() { return price; }
-        public void setPrice(double price) { this.price = price; }
-        public String getSellerName() { return sellerName; }
-        public void setSellerName(String sellerName) { this.sellerName = sellerName; }
+       
+        public String getItemName() 
+        { return itemName; }
+      
+        public String getBidder()
+        { return bidder; }
+      
+        public String getAmount() 
+        { return amount; }
     }
     
-    public String addItem() {
-        if (!isLoggedIn()) {
-            addActionError("You must be logged in to add items");
-            return INPUT;
-        }
+    // Make a bid
+    public String makeBid()
+    {
         
-        Connection conn = null;
+    	if (!isLoggedIn())
+    	{
+            addActionError("Please login first");
+            return ERROR;
+        }
         try {
-            conn = getConnection();
-            Integer userId = (Integer) session.get("userId");
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
             
-            String sql = "INSERT INTO items (item_name, description, price, seller_id) VALUES (?, ?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, itemName);
-            stmt.setString(2, description);
-            stmt.setDouble(3, price);
-            stmt.setInt(4, userId);
+            String user = (String) session.get("loggedInUser");
             
-            stmt.executeUpdate();
-            addActionMessage("Item added successfully!");
-            return viewAllItems();
+            // Simple bid insertion
+            String sql = "INSERT INTO bids (item_id, bidder_id, bid_amount) " +
+                         "VALUES ((SELECT item_id FROM items WHERE item_name='" + itemName + "'), " +
+                         "(SELECT user_id FROM users WHERE username='" + user + "'), " + bidAmount + ")";
+            stmt.executeUpdate(sql);
+            
+            addActionMessage("Bid placed!");
+            return SUCCESS;
             
         } catch (Exception e) {
-            e.printStackTrace();
-            addActionError("Failed to add item: " + e.getMessage());
-            return INPUT;
-        } finally {
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
+            addActionError("Cannot place bid");
+            return ERROR;
         }
     }
     
-    public String viewAllItems() {
-        Connection conn = null;
+    // View my bids
+    public String viewMyBids() {
+        if (!isLoggedIn()) {
+            addActionError("Please login first");
+            return ERROR;
+        }
         try {
-            conn = getConnection();
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
             
-            String sql = "SELECT i.*, u.username as seller_name FROM items i " +
-                         "JOIN users u ON i.seller_id = u.user_id ORDER BY i.created_at DESC";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
+            String user = (String) session.get("loggedInUser");
+            String sql = "SELECT i.item_name, u.username, b.bid_amount " +
+                         "FROM bids b " +
+                         "JOIN items i ON b.item_id = i.item_id " +
+                         "JOIN users u ON b.bidder_id = u.user_id " +
+                         "WHERE u.username='" + user + "'";
             
-            items = new ArrayList<>();
+            ResultSet rs = stmt.executeQuery(sql);
+            bids = new ArrayList<>();
+            
             while (rs.next()) {
-                Item item = new Item();
-                item.setItemId(rs.getInt("item_id"));
-                item.setItemName(rs.getString("item_name"));
-                item.setDescription(rs.getString("description"));
-                item.setPrice(rs.getDouble("price"));
-                item.setSellerName(rs.getString("seller_name"));
-                items.add(item);
+                Bid bid = new Bid();
+                bid.itemName = rs.getString("item_name");
+                bid.bidder = rs.getString("username");
+                bid.amount = rs.getString("bid_amount");
+                bids.add(bid);
             }
             
             return SUCCESS;
             
         } catch (Exception e) {
-            e.printStackTrace();
-            addActionError("Failed to load items: " + e.getMessage());
-            return INPUT;
-        } finally {
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
+            addActionError("Cannot load bids");
+            return ERROR;
         }
     }
     
     // Getters and setters
-    public String getItemName() { return itemName; }
-    public void setItemName(String itemName) { this.itemName = itemName; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
-    public List<Item> getItems() { return items; }
-    public void setItems(List<Item> items) { this.items = items; }
+    public String getItemName() 
+    { return itemName; }
+   
+    public void setItemName(String itemName)
+    { this.itemName = itemName; }
+    
+    public String getBidAmount() 
+    { return bidAmount; }
+    
+    public void setBidAmount(String bidAmount) 
+    { this.bidAmount = bidAmount; }
+    
+    public List<Bid> getBids() 
+    { return bids; }
 }
