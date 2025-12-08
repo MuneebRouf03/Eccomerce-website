@@ -1,37 +1,35 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <html>
-<head><title>Home Page</title></head>
+<head><title>Register</title></head>
 <body>
-    <h1>eCommerce Website</h1>
+    <h1>Register</h1>
     
-    <%-- Jenny's style: Simple scriptlet for logic --%>
-    <%
-        if (session.getAttribute("loggedInUser") != null) {
-    %>
-        <p>Logged in as: <%= session.getAttribute("loggedInUser") %></p>
-        <p><a href="logout">Logout</a></p>
-    <%
-        } else {
-    %>
-        <p><a href="login.jsp">Login</a> | <a href="register.jsp">Register</a></p>
-    <%
+    <script>
+    function validateRegister() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        
+        if(username.length < 3) {
+            alert("Username must be at least 3 characters");
+            return false;
         }
-    %>
+        
+        if(password.length < 3) {
+            alert("Password must be at least 3 characters");
+            return false;
+        }
+        
+        return true;
+    }
+    </script>
     
-    <%-- Jenny's style: Basic links --%>
-    <h3>Navigation:</h3>
-    <ul>
-        <li><a href="viewItems">View Items</a></li>
-        <%
-            if (session.getAttribute("loggedInUser") != null) {
-        %>
-            <li><a href="addItem.jsp">Add Item</a></li>
-            <li><a href="viewMyBids">My Bids</a></li>
-            <li><a href="viewAllUsers">All Users</a></li>
-        <%
-            }
-        %>
-    </ul>
+    <s:form action="register" onsubmit="return validateRegister()">
+        <s:textfield id="username" name="username" label="Username"/>
+        <s:password id="password" name="password" label="Password"/>
+        <s:submit value="Register"/>
+    </s:form>
+    
+    <p><a href="login.jsp">Login instead</a></p>
 </body>
 </html>

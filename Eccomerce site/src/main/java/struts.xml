@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+    
+<struts>
+    <package name="default" extends="struts-default">
+        
+        <!-- All actions use execute() method (default) -->
+        <action name="register" class="ecommerce.RegisterAction">
+            <result name="success">/login.jsp</result>
+            <result name="error">/register.jsp</result>
+        </action>
+        
+        <action name="login" class="ecommerce.LoginAction">
+            <result name="success">/viewItems.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+        
+        <action name="logout" class="ecommerce.LogoutAction">
+            <result>/index.jsp</result>
+        </action>
+        
+        <action name="addItem" class="ecommerce.ItemAction" method="addItem">
+            <result name="success" type="redirectAction">viewItems</result>
+            <result name="error">/addItem.jsp</result>
+        </action>
+        
+        <action name="viewItems" class="ecommerce.ItemAction" method="viewAllItems">
+            <result>/viewItems.jsp</result>
+        </action>
+        
+        <action name="makeBid" class="ecommerce.BidAction" method="makeBid">
+            <result name="success">/viewItems.jsp</result>
+            <result name="error">/viewItems.jsp</result>
+        </action>
+        
+        <action name="viewMyBids" class="ecommerce.BidAction" method="viewMyBids">
+            <result>/myBids.jsp</result>
+        </action>
+        
+        <action name="viewAllUsers" class="ecommerce.UserAction">
+            <result>/allUsers.jsp</result>
+        </action>
+        
+    </package>
+</struts>
