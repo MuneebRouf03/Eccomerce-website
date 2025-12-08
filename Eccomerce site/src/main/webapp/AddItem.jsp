@@ -1,24 +1,31 @@
-// Simple JavaScript for Add Item page
-function validateItemForm() {
-    var itemName = document.getElementById("itemName").value;
-    var price = document.getElementById("price").value;
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Item for Sale</title>
+</head>
+<body>
+    <h1>Add Item for Sale</h1>
     
-    if(itemName.trim() === "") {
-        alert("Please enter item name");
-        return false;
-    }
+    <s:if test="%{#session.loggedInUser != null}">
+        <p>Logged in as: <strong><s:property value="#session.loggedInUser" /></strong></p>
+        <p><a href="viewItems">Home</a> | <a href="logout">Logout</a></p>
+    </s:if>
     
-    if(price.trim() === "" || isNaN(price) || parseFloat(price) <= 0) {
-        alert("Please enter a valid price");
-        return false;
-    }
+    <hr>
     
-    return true;
-}
-
-function clearForm() {
-    document.getElementById("itemName").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("price").value = "";
-    alert("Form cleared!");
-}
+    <s:form action="addItem">
+        <s:textfield name="itemName" label="Item Name" required="true"/>
+        <s:textarea name="description" label="Description" rows="4" cols="50"/>
+        <s:textfield name="price" label="Price (€)" required="true"/>
+        <s:submit value="Add Item"/>
+    </s:form>
+    
+    <s:if test="hasActionErrors()">
+        <div style="color:red;">
+            <s:actionerror/>
+        </div>
+    </s:if>
+</body>
+</html>

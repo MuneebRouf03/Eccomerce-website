@@ -1,35 +1,27 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
+<!DOCTYPE html>
 <html>
-<head><title>Register</title></head>
+<head>
+    <title>Register</title>
+</head>
 <body>
-    <h1>Register</h1>
+    <h1>User Registration</h1>
     
-    <script>
-    function validateRegister() {
-        var username = document.getElementById("username").value;
-        var password = document.getElementById("password").value;
-        
-        if(username.length < 3) {
-            alert("Username must be at least 3 characters");
-            return false;
-        }
-        
-        if(password.length < 3) {
-            alert("Password must be at least 3 characters");
-            return false;
-        }
-        
-        return true;
-    }
-    </script>
-    
-    <s:form action="register" onsubmit="return validateRegister()">
-        <s:textfield id="username" name="username" label="Username"/>
-        <s:password id="password" name="password" label="Password"/>
+    <s:form action="register">
+        <s:textfield name="username" label="Username" required="true"/>
+        <s:password name="password" label="Password" required="true"/>
+        <s:textfield name="email" label="Email"/>
+        <s:textfield name="fullName" label="Full Name"/>
         <s:submit value="Register"/>
     </s:form>
     
-    <p><a href="login.jsp">Login instead</a></p>
+    <p>Already have an account? <a href="login.jsp">Login here</a></p>
+    
+    <s:if test="hasActionErrors()">
+        <div style="color:red;">
+            <s:actionerror/>
+        </div>
+    </s:if>
 </body>
 </html>

@@ -1,12 +1,15 @@
 package ecommerce;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.Statement;
 
-public class LoginAction extends BaseAction 
-{
-    private String username;
+public class RegisterAction extends BaseAction {
+    
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String username;
     private String password;
     
     public String execute() {
@@ -15,26 +18,21 @@ public class LoginAction extends BaseAction
             conn = getConnection();
             Statement stmt = conn.createStatement();
             
-            // Simple query
-            String sql = "SELECT * FROM users WHERE username='" + 
-                        username + "' AND password='" + password + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            // Simple insert - no duplicate checking
+            String sql = "INSERT INTO users (username, password) VALUES ('" + 
+                         username + "', '" + password + "')";
+            stmt.executeUpdate(sql);
             
-            if (rs.next()) {
-                // Store in session
-                session.put("loggedInUser", username);
-                return SUCCESS;
-            } else {
-                addActionError("Invalid login");
-                return ERROR;
-            }
+            addActionMessage("Registration successful!");
+            return SUCCESS;
             
         } catch (Exception e) {
-            addActionError("Login error");
+            addActionError("Registration failed");
             return ERROR;
         }
     }
     
+    // Getters and setters
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }

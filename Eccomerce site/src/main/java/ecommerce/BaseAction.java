@@ -14,8 +14,9 @@ public class BaseAction extends ActionSupport implements SessionAware {
     protected Connection getConnection() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");
         return DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/ecommerce_db",
-            "root", "root");
+        	    "jdbc:mysql://localhost:3306/ecommerce_db",  // ← DATABASE LOCATION
+        	    "root",   // ← YOUR MYSQL USERNAME
+        	    "root");  // ← YOUR MYSQL PASSWORD
     }
     
     // Check if user is logged in
